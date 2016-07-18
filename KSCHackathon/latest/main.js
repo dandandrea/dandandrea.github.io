@@ -11,6 +11,9 @@ var mainState = {
     thrustSidewaysAmount: 5,
     maxLandingVelocity: 100,
 
+    terrainMaxYValue: 100,
+    paddingY: 250,
+
     preload: function() {
         game.load.image('lander', 'assets/lander.png'); 
     },
@@ -78,8 +81,6 @@ var mainState = {
         {
             if (detectSuccessfulLanding(this.lander, this.platform, this.maxLandingVelocity) == true)
             {
-                // console.log("Successful landing");
-
                 this.labelInvoiceDelivered.text = "Invoice delivered!";
                 this.game.time.events.add(Phaser.Timer.SECOND * 2, this.clearStatus, this);
 
@@ -168,8 +169,6 @@ var mainState = {
     },
 
     resetTerrain: function() {
-        var lineHeight = 2;
-
         if (this.lines != null)
         {
             for (i = 0; i < this.lines.length; i++)
@@ -181,28 +180,74 @@ var mainState = {
         this.lines = new Array();
         this.terrain = new Array();
 
-        var platformCoordinates = getPlatformCoordinates(this.canvasWidth, this.canvasHeight, 20, 100, 1);
+        var platformCoordinates = getPlatformCoordinates(this.canvasWidth, this.canvasHeight, 20, this.terrainMaxYValue, 1);
         var platformStructure = {};
         platformStructure.landed = false;
         platformStructure.coordinates = platformCoordinates[0];
         this.terrain.push(platformCoordinates[0]);
         this.platform = platformStructure;
 
-        var x1, y1, x2, y2;
+        var numberOfLeftSideLines = 3;
+        for (i = 1; i <= numberOfLeftSideLines; i++)
+        {
+            var x1, y1, x2, y2;
 
-        x1 = 0;
-        y1 = Math.floor(Math.random() * this.canvasHeight) + 0;
-        x2 = this.platform.coordinates.x1;
-        y2 = this.platform.coordinates.y1;
+            if (i == 1)
+            {
+                x1 = 0;
+                y1 = Math.floor((Math.random() * (this.canvasHeight - this.paddingY)) + this.paddingY);
+                x2 = Math.floor(Math.random() * this.platform.coordinates.x1);
+                y2 = Math.floor((Math.random() * (this.canvasHeight - this.paddingY)) + this.paddingY);
+            }
+            else if (i == numberOfLeftSideLines)
+            {
+                x1 = this.terrain[i - 1].x2;
+                y1 = this.terrain[i - 1].y2;
+                x2 = this.platform.coordinates.x1;
+                y2 = this.platform.coordinates.y1;
+            }
+            else
+            {
+                x1 = this.terrain[i - 1].x2;
+                y1 = this.terrain[i - 1].y2;
+                x2 = Math.floor(Math.random() * (this.platform.coordinates.x1 - this.terrain[i - 1].x2)) + this.terrain[i - 1].x2;
+                y2 = Math.floor((Math.random() * (this.canvasHeight - this.paddingY)) + this.paddingY);
+            }
 
-        this.terrain.push({"x1": x1, "y1": y1, "x2": x2, "y2": y2});
+            this.terrain.push({"x1": x1, "y1": y1, "x2": x2, "y2": y2});
+        }
 
-        x1 = this.platform.coordinates.x2;
-        y1 = this.platform.coordinates.y2;
-        x2 = this.canvasWidth;
-        y2 = Math.floor(Math.random() * this.canvasHeight) + 0;
+        var numberOfRightSideLines = 3;
+        for (i = numberOfLeftSideLines + 1; i <= numberOfLeftSideLines + numberOfRightSideLines; i++)
+        {
+            var x1, y1, x2, y2;
 
-        this.terrain.push({"x1": x1, "y1": y1, "x2": x2, "y2": y2});
+            if (i == numberOfLeftSideLines + 1)
+            {
+                x1 = this.platform.coordinates.x2;
+                y1 = this.platform.coordinates.y2;
+                x2 = Math.floor(Math.random() * (this.canvasWidth - this.platform.coordinates.x2)) + this.platform.coordinates.x2;
+                y2 = Math.floor((Math.random() * (this.canvasHeight - this.paddingY)) + this.paddingY);
+            }
+            else if (i == numberOfLeftSideLines + numberOfRightSideLines)
+            {
+                x1 = this.terrain[i - 1].x2;
+                y1 = this.terrain[i - 1].y2;
+                x2 = this.canvasWidth;
+                y2 = Math.floor((Math.random() * (this.canvasHeight - this.paddingY)) + this.paddingY);
+            }
+            else
+            {
+                x1 = this.terrain[i - 1].x2;
+                y1 = this.terrain[i - 1].y2;
+                x2 = Math.floor(Math.random() * (this.canvasWidth - this.terrain[i - 1].x2)) + this.terrain[i - 1].x2;
+                y2 = Math.floor((Math.random() * (this.canvasHeight - this.paddingY)) + this.paddingY);
+            }
+
+            this.terrain.push({"x1": x1, "y1": y1, "x2": x2, "y2": y2});
+        }
+
+        var lineHeight = 2;
 
         for (i = 0; i < this.terrain.length; i++)
         {
