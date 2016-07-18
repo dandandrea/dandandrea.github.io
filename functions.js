@@ -45,6 +45,7 @@ function drawLine(game, x1, y1, x2, y2, lineHeight, color)
     line.lineStyle(lineHeight, color, 1);
     line.moveTo(x1, y1);
     line.lineTo(x2, y2);
+    return line;
 }
 
 function detectSuccessfulLanding(lander, platform, maxVelocity)

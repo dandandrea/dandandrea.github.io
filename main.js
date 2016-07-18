@@ -170,14 +170,15 @@ var mainState = {
     resetTerrain: function() {
         var lineHeight = 2;
 
-        if (this.terrain != null)
+        if (this.lines != null)
         {
-            for (i = 0; i < this.terrain.length; i++)
+            for (i = 0; i < this.lines.length; i++)
             {
-                drawLine(game, this.terrain[i].x1, this.terrain[i].y1, this.terrain[i].x2, this.terrain[i].y2, lineHeight, 0x000000);
+                this.lines[i].kill();
             }
         }
 
+        this.lines = new Array();
         this.terrain = new Array();
 
         var platformCoordinates = getPlatformCoordinates(this.canvasWidth, this.canvasHeight, 20, 100, 1);
@@ -205,14 +206,15 @@ var mainState = {
 
         for (i = 0; i < this.terrain.length; i++)
         {
-            var lineColor =  0xffffff;
+            var lineColor =  0x666699;
 
             if (i == 0)
             {
                 lineColor = 0xffff00;
             }
 
-            drawLine(game, this.terrain[i].x1, this.terrain[i].y1, this.terrain[i].x2, this.terrain[i].y2, lineHeight, lineColor);
+            var line = drawLine(game, this.terrain[i].x1, this.terrain[i].y1, this.terrain[i].x2, this.terrain[i].y2, lineHeight, lineColor);
+            this.lines.push(line);
         }
     },
 
